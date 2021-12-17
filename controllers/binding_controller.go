@@ -34,10 +34,11 @@ import (
 // BindingReconciler reconciles a Binding object
 type BindingReconciler struct {
 	client.Client
-	Log                   logr.Logger
-	Scheme                *runtime.Scheme
-	Recorder              record.EventRecorder
-	RabbitmqClientFactory internal.RabbitMQClientFactory
+	Log                     logr.Logger
+	Scheme                  *runtime.Scheme
+	Recorder                record.EventRecorder
+	RabbitmqClientFactory   internal.RabbitMQClientFactory
+	KubernetesClusterDomain string
 }
 
 // +kubebuilder:rbac:groups=rabbitmq.com,resources=bindings,verbs=get;list;watch;create;update;patch;delete
@@ -85,7 +86,7 @@ func (r *BindingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return reconcile.Result{}, err
 	}
 
-	rabbitClient, err := r.RabbitmqClientFactory(rmq, svc, secret, serviceDNSAddress(svc), systemCertPool)
+	rabbitClient, err := r.RabbitmqClientFactory(rmq, svc, secret, serviceDNSAddress(svc, r.KubernetesClusterDomain), systemCertPool)
 	if err != nil {
 		logger.Error(err, failedGenerateRabbitClient)
 		return reconcile.Result{}, err

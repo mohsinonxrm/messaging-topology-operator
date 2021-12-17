@@ -32,10 +32,11 @@ import (
 // ExchangeReconciler reconciles a Exchange object
 type ExchangeReconciler struct {
 	client.Client
-	Log                   logr.Logger
-	Scheme                *runtime.Scheme
-	Recorder              record.EventRecorder
-	RabbitmqClientFactory internal.RabbitMQClientFactory
+	Log                     logr.Logger
+	Scheme                  *runtime.Scheme
+	Recorder                record.EventRecorder
+	RabbitmqClientFactory   internal.RabbitMQClientFactory
+	KubernetesClusterDomain string
 }
 
 // +kubebuilder:rbac:groups=rabbitmq.com,resources=exchanges,verbs=get;list;watch;create;update;patch;delete
@@ -83,7 +84,7 @@ func (r *ExchangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return reconcile.Result{}, err
 	}
 
-	rabbitClient, err := r.RabbitmqClientFactory(rmq, svc, secret, serviceDNSAddress(svc), systemCertPool)
+	rabbitClient, err := r.RabbitmqClientFactory(rmq, svc, secret, serviceDNSAddress(svc, r.KubernetesClusterDomain), systemCertPool)
 	if err != nil {
 		logger.Error(err, failedGenerateRabbitClient)
 		return reconcile.Result{}, err

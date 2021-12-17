@@ -55,7 +55,10 @@ var RabbitholeClientFactory RabbitMQClientFactory = func(rmq *rabbitmqv1beta1.Ra
 }
 
 // returns a http client for the given RabbitmqCluster
-func generateRabbitholeClient(rmq *rabbitmqv1beta1.RabbitmqCluster, svc *corev1.Service, secret *corev1.Secret, hostname string, certPool *x509.CertPool) (rabbitmqClient RabbitMQClient, err error) {
+func generateRabbitholeClient(rmq *rabbitmqv1beta1.RabbitmqCluster,
+	svc *corev1.Service, secret *corev1.Secret,
+	hostname string,
+	certPool *x509.CertPool) (rabbitmqClient RabbitMQClient, err error) {
 	endpoint, err := managementEndpoint(rmq, svc, hostname)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get endpoint from specified rabbitmqcluster: %w", err)
